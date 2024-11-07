@@ -38,7 +38,7 @@ python sync_ddns.py
 执行以下命令在后台运行。
 
 ```bash
-nohup python3 sync_ddns.py > ddns.log &
+nohup python sync_ddns.py > ddns.log &
 ```
 
 ## 配置说明
