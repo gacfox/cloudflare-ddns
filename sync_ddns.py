@@ -146,6 +146,13 @@ def config_logging():
 
 
 def check_settings():
+    if settings['log_level']:
+        if settings['log_level'] not in ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'):
+            logging.critical(
+                '配置校验不通过: log_level不是有效的日志级别名，可选值：DEBUG, INFO, WARNING, ERROR, CRITICAL')
+            exit(1)
+        else:
+            logging.getLogger().setLevel(settings['log_level'])
     if not settings['zone_id']:
         logging.critical('配置校验不通过: zone_id不能为空')
         exit(1)

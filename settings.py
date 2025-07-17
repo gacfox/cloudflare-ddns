@@ -9,6 +9,7 @@ def clean(value):
 
 load_dotenv()
 settings = {
+    'log_level': clean(os.getenv('LOG_LEVEL')),
     'zone_id': clean(os.getenv('ZONE_ID')),
     'authorization_key': clean(os.getenv('AUTHORIZATION_KEY')),
     'network_interface': clean(os.getenv('NETWORK_INTERFACE')),
