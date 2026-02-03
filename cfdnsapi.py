@@ -13,7 +13,7 @@ def get_dns_record(record_type, domain, zone_id, authorization_key):
         'Authorization': 'Bearer %s' % authorization_key,
         'Content-Type': 'application/json'
     }
-    rsp = requests.get(url, params, headers=headers)
+    rsp = requests.get(url, params, headers=headers, timeout=30)
     rsp.encoding = "utf-8"
     rsp_json = rsp.json()
     if not rsp_json.get('success'):
@@ -35,7 +35,7 @@ def create_dns_record(record_type, domain, ip, zone_id, authorization_key):
         'Authorization': 'Bearer %s' % authorization_key,
         'Content-Type': 'application/json'
     }
-    rsp = requests.post(url, json=json_data, headers=headers)
+    rsp = requests.post(url, json=json_data, headers=headers, timeout=30)
     rsp.encoding = "utf-8"
     rsp_json = rsp.json()
     if not rsp_json.get('success'):
@@ -57,7 +57,7 @@ def update_dns_record(record_type, domain, ip, zone_id, dns_id, authorization_ke
         'Authorization': 'Bearer %s' % authorization_key,
         'Content-Type': 'application/json'
     }
-    rsp = requests.put(url, json=json_data, headers=headers)
+    rsp = requests.put(url, json=json_data, headers=headers, timeout=30)
     rsp.encoding = "utf-8"
     rsp_json = rsp.json()
     if not rsp_json.get('success'):
