@@ -105,7 +105,7 @@ def get_public_ipv6(addrs):
 
 def process_update(status, record_type, ip):
     # 判断哪些域名需要更新
-    updated_domains = status.get('last_update_domains')
+    updated_domains = status.get('last_update_domains') or []
     to_update_domains = []
     if status.get('last_ip') == ip:
         for domain in settings['domain_names']:
