@@ -37,7 +37,7 @@ go mod tidy; go build -o cloudflare-ddns.exe .\cmd\ddns
 
 #### Windows下交叉编译到树莓派
 
-```bash
+```powershell
 $env:GOOS="linux"; $env:GOARCH="arm64"; go mod tidy; go build -o cloudflare-ddns ./cmd/ddns
 ```
 
