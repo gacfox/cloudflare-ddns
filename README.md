@@ -10,7 +10,7 @@
 
 ![](doc/1.png)
 
-在站点配置页面中找到`区域ID`、`API令牌`：
+在站点配置页面中找到`区域ID`、`API令牌`。
 
 ![](doc/2.png)
 
@@ -19,26 +19,40 @@
 
 ### 编写配置文件
 
-下载工程后，先切换到工程目录创建虚拟环境并安装依赖。
+下载工程后，参考`.env.example`创建`.env`配置文件，并填入相关配置。
+
+### 编译工程
+
+#### Linux下编译
 
 ```bash
-python -m venv ./venv/ && source venv/bin/activate && pip install -r requirements.txt
+go mod tidy && go build -o cloudflare-ddns ./cmd/ddns
 ```
 
-然后参考`.env.example`创建`.env`配置文件，并填入相关配置。
+#### Windows下编译
+
+```powershell
+go mod tidy; go build -o cloudflare-ddns.exe .\cmd\ddns
+```
+
+#### Windows下交叉编译到树莓派
+
+```bash
+$env:GOOS="linux"; $env:GOARCH="arm64"; go mod tidy; go build -o cloudflare-ddns ./cmd/ddns
+```
 
 ### 运行工程
 
 执行以下命令运行。
 
 ```bash
-python sync_ddns.py
+./cloudflare-ddns
 ```
 
 执行以下命令在后台运行。
 
 ```bash
-nohup python sync_ddns.py > ddns.log 2>&1 &
+nohup ./cloudflare-ddns > ddns.log 2>&1 &
 ```
 
 ## 配置说明

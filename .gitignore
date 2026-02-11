@@ -1,19 +1,37 @@
-venv
-__pycache__
-.env
+# build
+cloudflare-ddns
+cloudflare-ddns.exe
 
-### Eclipse ###
-.classpath
-.factorypath
-.project
-.settings
-
-### IntelliJ IDEA ###
+# IntelliJ IDEA
 .idea
 *.iws
 *.iml
 *.ipr
 
-### VS Code ###
+# VS Code
 .vscode/
 .VSCodeCounter
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# local env files
+.env
+
+# AI
+AGENTS*.md
+CLAUDE*.md
+GEMINI*.md
+QWEN*.md
+.cursorrules
+.windsurfrules
+CODEX*.md
+.claude/
+.gemini/
+.cursor/
+.windsurf/
+.clinerules/
+.ai/
+.vibecache/
