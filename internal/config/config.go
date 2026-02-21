@@ -24,7 +24,7 @@ type Config struct {
 const defaultUpdateIntervalSeconds = 120
 
 func Load() (*Config, error) {
-	err := godotenv.Load()
+	err := godotenv.Overload()
 	if err != nil {
 		logrus.Warnf(".env file not found: %v", err)
 	}
