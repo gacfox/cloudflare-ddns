@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"strconv"
 	"strings"
@@ -44,21 +45,26 @@ func Load() (*Config, error) {
 
 func Validate(cfg *Config) error {
 	if cfg.LogLevel != "" && !isValidLogLevel(cfg.LogLevel) {
-		logrus.Fatalf("配置校验不通过: log_level不是有效的日志级别名，可选值：DEBUG, INFO, WARN, ERROR, FATAL, PANIC")
+		return validationError("配置校验不通过: log_level不是有效的日志级别名，可选值：DEBUG, INFO, WARN, ERROR, FATAL, PANIC")
 	}
 	if cfg.ZoneID == "" {
-		logrus.Fatalf("配置校验不通过: zone_id不能为空")
+		return validationError("配置校验不通过: zone_id不能为空")
 	}
 	if cfg.AuthorizationKey == "" {
-		logrus.Fatalf("配置校验不通过: authorization_key不能为空")
+		return validationError("配置校验不通过: authorization_key不能为空")
 	}
 	if cfg.NetworkInterface == "" {
-		logrus.Fatalf("配置校验不通过: network_interface不能为空")
+		return validationError("配置校验不通过: network_interface不能为空")
 	}
 	if len(cfg.DomainNames) == 0 {
-		logrus.Fatalf("配置校验不通过: domain_names需要配置一个以上的域名")
+		return validationError("配置校验不通过: domain_names需要配置一个以上的域名")
 	}
 	return nil
+}
+
+func validationError(message string) error {
+	logrus.Error(message)
+	return errors.New(message)
 }
 
 func isValidLogLevel(level string) bool {

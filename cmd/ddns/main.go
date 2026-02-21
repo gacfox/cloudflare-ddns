@@ -6,6 +6,7 @@ import (
 	"cloudflare-ddns/internal/network"
 	"cloudflare-ddns/internal/status"
 	"cloudflare-ddns/internal/updater"
+	"fmt"
 	"strings"
 	"time"
 
@@ -13,12 +14,10 @@ import (
 )
 
 func main() {
-	cfg, err := config.Load()
+	cfg, err := loadAndValidateConfig()
 	if err != nil {
 		logrus.Fatalf("加载配置失败: %v", err)
 	}
-
-	config.Validate(cfg)
 
 	setupLogger(cfg)
 
@@ -27,25 +26,35 @@ func main() {
 
 	client := api.NewClient(cfg.ZoneID, cfg.AuthorizationKey)
 	statusManager := status.NewManager()
-	upd := updater.NewUpdater(cfg, client)
-
-	if err := runUpdate(cfg, statusManager, upd); err != nil {
+	if err := runUpdate(cfg, statusManager, client); err != nil {
 		logrus.Fatalf("首次更新失败: %v", err)
 	}
 
-	ticker := time.NewTicker(time.Duration(cfg.UpdateIntervalSeconds) * time.Second)
-	defer ticker.Stop()
-
 	logrus.Infof("定时任务启动，更新间隔: %d 秒", cfg.UpdateIntervalSeconds)
 
-	for range ticker.C {
-		if err := runUpdate(cfg, statusManager, upd); err != nil {
+	for {
+		time.Sleep(time.Duration(cfg.UpdateIntervalSeconds) * time.Second)
+
+		latestCfg, err := loadAndValidateConfig()
+		if err != nil {
+			logrus.Errorf("热加载配置失败，继续使用旧配置: %v", err)
+		} else {
+			cfg = latestCfg
+			setupLogger(cfg)
+			client = api.NewClient(cfg.ZoneID, cfg.AuthorizationKey)
+			logrus.Infof("配置热加载成功，ZoneID: %s, 网络接口: %s, 域名: %v, 更新间隔: %d 秒",
+				cfg.ZoneID, cfg.NetworkInterface, cfg.DomainNames, cfg.UpdateIntervalSeconds)
+		}
+
+		if err := runUpdate(cfg, statusManager, client); err != nil {
 			logrus.Errorf("更新失败: %v", err)
 		}
 	}
 }
 
-func runUpdate(cfg *config.Config, statusManager *status.Manager, upd *updater.Updater) error {
+func runUpdate(cfg *config.Config, statusManager *status.Manager, client *api.Client) error {
+	upd := updater.NewUpdater(cfg, client)
+
 	ipv4, ipv6, err := network.GetNetworkAddresses(cfg.NetworkInterface)
 	if err != nil {
 		logrus.Errorf("获取网络接口[%s]地址失败: %v", cfg.NetworkInterface, err)
@@ -108,4 +117,15 @@ func setupLogger(cfg *config.Config) {
 		level = logrus.InfoLevel
 	}
 	logrus.SetLevel(level)
+}
+
+func loadAndValidateConfig() (*config.Config, error) {
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, fmt.Errorf("加载配置失败: %w", err)
+	}
+	if err := config.Validate(cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }
