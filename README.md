@@ -55,6 +55,47 @@ $env:GOOS="linux"; $env:GOARCH="arm64"; go mod tidy; go build -o cloudflare-ddns
 nohup ./cloudflare-ddns > ddns.log 2>&1 &
 ```
 
+### 配置为Systemd服务（Linux）
+
+创建Service单元配置文件`/etc/systemd/system/cloudflare-ddns.service`写入以下内容（注意根据实际情况修改`WorkingDirectory`和`ExecStart`路径）。
+
+```ini
+[Unit]
+Description=Cloudflare DDNS Client
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/cloudflare-ddns
+ExecStart=/opt/cloudflare-ddns/cloudflare-ddns
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+```
+
+启用并启动服务。
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable cloudflare-ddns
+sudo systemctl start cloudflare-ddns
+```
+
+查看服务状态。
+
+```bash
+sudo systemctl status cloudflare-ddns
+```
+
+查看日志。
+
+```bash
+journalctl -u cloudflare-ddns -f
+```
+
 ## 配置说明
 
 **ZONE_ID**：从Cloudflare控制台获取。
